@@ -137,8 +137,14 @@ module Terraforming
           "#{permission.ip_protocol}-" <<
           "#{self_referenced_permission?(security_group, permission).to_s}-"
 
-        permission.ip_ranges.each { |range| string << "#{range.cidr_ip}-" }
-        security_groups_in(permission).each { |group| string << "#{group}-" }
+        ips = []
+        permission.ip_ranges.each { |range| ips.push "#{range.cidr_ip}-" }
+
+        security_groups = []
+        security_groups_in(permission).each { |group| security_groups.push "#{group}-" }
+
+        string << ips.sort.join
+        string << security_groups.sort.join
 
         Zlib.crc32(string)
       end
